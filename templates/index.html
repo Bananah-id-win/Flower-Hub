@@ -150,7 +150,7 @@
 
             <div class="text-center space-y-2">
                 <h1 class="text-3xl font-black text-stone-900 tracking-tight">Fun Themes</h1>
-                <p class="text-stone-600 text-xs">Choose a flower, and the page will switch to its matching colour palette instantly. No AI, no API, no image input needed.</p>
+                <p class="text-stone-600 text-xs">Choose a flower, and the page will switch to its matching colour palette instantly.</p>
                 <p id="themeIndicator" class="text-stone-500 text-xs">Selected: Default</p>
             </div>
 
@@ -218,14 +218,11 @@
                         </div>
                     </div>
                 </button>
-                <button onclick="resetTheme()" class="theme-button col-span-1 sm:col-span-2 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 text-emerald-700 rounded-3xl p-5 text-center shadow-sm hover:shadow-md transition">
-                    <div class="flex items-center justify-center gap-2">
-                        <span class="text-2xl">✨</span>
-                        <div>
-                            <h3 class="font-bold text-stone-900">Reset to Normal</h3>
-                            <p class="text-stone-500 text-xs">Return to the default theme.</p>
-                        </div>
-                    </div>
+            </div>
+
+            <div class="mt-6 flex justify-center">
+                <button onclick="restoreOriginalTheme()" class="bg-stone-700 hover:bg-stone-800 text-white font-bold py-3 px-6 rounded-xl transition-all transform active:scale-95 flex items-center gap-2">
+                    <span>🔄</span> Restore to Original Colors
                 </button>
             </div>
         </div>
@@ -386,70 +383,72 @@
             const button = document.querySelector(`button[onclick="setFlowerTheme('${name}')"]`);
             if (button) button.classList.add('ring-2', 'ring-fuchsia-500');
         }
-        function resetTheme() {
-            // Restore original/default colors
-            const defaultTheme = {
-                theme_name: 'Default',
-                primary_color: 'transparent',
-                background_color: 'linear-gradient(to br, rgb(245, 245, 244) via-transparent/20, rgb(236, 241, 251) to-transparent)',
-                banner_gradient: 'linear-gradient(to right, rgb(6, 78, 59) 0%, rgb(12, 74, 110) 100%)',
-                light_bg: 'white',
-                text_color: '#059669'
-            };
+        function restoreOriginalTheme() {
+            // Reset body background
+            document.body.style.background = '';
             
-            // Restore body background
-            document.body.style.background = defaultTheme.background_color;
-            
-            // Restore navbar
-            const nav = document.querySelector('nav');
-            if (nav) nav.style.backgroundColor = 'white';
-            
-            // Restore welcome banner
+            // Reset welcome banner
             const welcomeBanner = document.getElementById('welcome-banner');
-            if (welcomeBanner) welcomeBanner.style.backgroundImage = defaultTheme.banner_gradient;
+            if (welcomeBanner) welcomeBanner.style.backgroundImage = '';
             
-            // Restore white boxes
+            // Reset nav
+            const nav = document.querySelector('nav');
+            if (nav) nav.style.backgroundColor = '';
+            
+            // Reset scan button
+            const scanBtn = document.getElementById('scanBtn');
+            if (scanBtn) scanBtn.style.backgroundColor = '';
+            
+            // Reset result container border
+            const resultContainer = document.getElementById('resultContainer');
+            if (resultContainer) resultContainer.style.borderColor = '';
+            
+            // Reset banner text colors (back to original)
+            const h1 = document.querySelector('#welcome-banner h1');
+            if (h1) h1.style.color = '';
+            const descP = document.querySelector('#welcome-banner > div > p');
+            if (descP) descP.style.color = '';
+            const flowerSpan = document.querySelector('#welcome-banner span[class*="text"]');
+            if (flowerSpan) flowerSpan.style.color = '';
+            const flowerLabel = document.getElementById('todayFlowerLabel');
+            if (flowerLabel) flowerLabel.style.color = '';
+            const todayFlowerLink = document.getElementById('todayFlowerLink');
+            if (todayFlowerLink) todayFlowerLink.style.color = '';
+            const sourceP = document.querySelector('#welcome-banner p[class*="text-\\[11px\\]"]');
+            if (sourceP) sourceP.style.color = '';
+            const sourceLink = sourceP?.querySelector('a');
+            if (sourceLink) sourceLink.style.color = '';
+            
+            // Reset all white boxes
             document.querySelectorAll('.bg-white').forEach(el => {
-                el.style.backgroundColor = 'white';
+                el.style.backgroundColor = '';
             });
             
-            // Restore green text
+            // Reset all emerald/green text
             document.querySelectorAll('[class*="text-emerald"], [class*="text-green"]').forEach(el => {
                 el.style.color = '';
             });
             
-            // Restore emerald borders
-            document.querySelectorAll('[class*="border-emerald"]').forEach(el => {
+            // Reset all borders
+            document.querySelectorAll('[class*="border-emerald"], [class*="hover:border-emerald"]').forEach(el => {
                 el.style.borderColor = '';
             });
             
-            // Restore scan button
-            const scanBtn = document.getElementById('scanBtn');
-            if (scanBtn) scanBtn.style.backgroundColor = 'rgb(5, 150, 105)';
-            
-            // Restore result container border
-            const resultContainer = document.getElementById('resultContainer');
-            if (resultContainer) resultContainer.style.borderColor = '';
-            
-            // Restore back button colors
+            // Reset back button colors
             document.querySelectorAll('button').forEach(btn => {
                 if (btn.textContent.includes('Back') || btn.textContent.includes('←')) {
                     btn.style.color = '';
                 }
             });
             
-            // Restore theme indicator
-            const themeIndicator = document.getElementById('themeIndicator');
-            if (themeIndicator) themeIndicator.innerText = 'Selected: Default';
-            
             // Remove ring from all theme buttons
             document.querySelectorAll('.theme-button').forEach(btn => {
                 btn.classList.remove('ring-2', 'ring-fuchsia-500');
             });
             
-            // Add ring to reset button
-            const resetBtn = document.querySelector('button[onclick="resetTheme()"]');
-            if (resetBtn) resetBtn.classList.add('ring-2', 'ring-fuchsia-500');
+            // Reset theme indicator
+            const themeIndicator = document.getElementById('themeIndicator');
+            if (themeIndicator) themeIndicator.innerText = 'Selected: Default';
         }
         function checkBirthFlower() {
             const m = document.getElementById('searchMonth').value;
