@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Flower Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(12px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-stone-50 via-emerald-50/20 to-teal-50 min-h-screen flex flex-col font-sans text-stone-800">
+
+    <nav class="w-full bg-white border-b border-stone-200 px-6 py-4 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-2 font-black text-emerald-900 text-2xl tracking-tight cursor-pointer" onclick="switchTab('home')">
+            <span>💔🥀</span> Flower Hub
+        </div>
+        <div class="flex items-center gap-6 text-sm font-semibold text-stone-600">
+            <button onclick="switchTab('home')" id="nav-home" class="text-emerald-700 font-bold transition">Dashboard</button>
+            <button onclick="switchTab('scanner')" id="nav-scanner" class="hover:text-emerald-900 transition">Clinic Scanner</button>
+            <button onclick="switchTab('fun')" id="nav-fun" class="hover:text-emerald-900 transition">Fun Themes</button>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl w-full mx-auto p-6 flex-1 flex flex-col justify-start">
+        
+        <div id="home-view" class="space-y-8 animate-fadeIn">
+            <div id="welcome-banner" class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white rounded-3xl p-8 shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <h1 class="text-3xl font-black mb-2 text-white">Welcome to Flower Hub</h1>
+                    <p class="text-white max-w-md text-sm">Your all-in-one botanical workspace. Monitor local specimens, manage diagnostic history, or consult our automated clinic features.</p>
+                </div>
+                
+                <div class="bg-white/10 border border-white/20 backdrop-blur-md p-4 rounded-2xl w-full md:w-64 space-y-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-white">🗓️ Flower of Today (<span id="todayDateLabel">Loading...</span>)</span>
+                    <h3 class="text-xl font-black text-white">
+                        <a id="todayFlowerLink" href="https://www.mybirthdayflower.com/" target="_blank" class="hover:underline flex items-center gap-1">
+                            <span id="todayFlowerLabel">Loading...</span>
+                        </a>
+                    </h3>
+                    <p class="text-[11px] text-white">Source: <a href="https://www.mybirthdayflower.com/" target="_blank" class="text-white hover:underline">My Birthday Flower</a></p>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-4">Available Hub Sub-Features</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <div onclick="switchTab('scanner')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition cursor-pointer flex gap-4 items-start group">
+                        <div class="text-3xl p-3 bg-emerald-50 rounded-xl group-hover:scale-110 transition-transform">🩺</div>
+                        <div>
+                            <h3 class="font-bold text-stone-900 text-lg mb-1">Plant Recovery Clinic</h3>
+                            <p class="text-stone-500 text-xs leading-relaxed">Examine wilting tissues, diagnose pathogen symptoms, and get custom healing instructions.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex gap-4 items-start">
+                        <div class="text-3xl p-3 bg-amber-50 rounded-xl">🎂</div>
+                        <div class="space-y-2 w-full">
+                            <h3 class="font-bold text-stone-900 text-lg">Birth Flower Finder</h3>
+                            <p class="text-stone-500 text-xs leading-relaxed">Select any month to reveal its associated dynamic birthday signature.</p>
+                            
+                            <div class="flex gap-2 pt-1">
+                                <select id="searchMonth" class="bg-stone-50 border border-stone-200 text-xs rounded-lg p-1.5 focus:outline-none focus:border-emerald-500">
+                                    <option value="June">June</option>
+                                    <option value="April">April</option>
+                                    <option value="May">May</option>
+                                </select>
+                                <input type="number" id="searchDay" min="1" max="31" value="7" class="w-14 bg-stone-50 border border-stone-200 text-xs rounded-lg p-1.5 text-center focus:outline-none focus:border-emerald-500">
+                                <button onclick="checkBirthFlower()" class="bg-stone-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-stone-800 transition">Find</button>
+                            </div>
+                            <p id="searchResult" class="text-xs font-bold text-stone-700 pt-1 hidden">
+                                🌸 Flower: <a id="flowerInfoLink" href="#" target="_blank" class="text-emerald-700 hover:underline inline-flex items-center gap-0.5"><span></span> 🔗</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div onclick="switchTab('fun')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md hover:border-fuchsia-300 transition cursor-pointer flex gap-4 items-start group">
+                        <div class="text-3xl p-3 bg-fuchsia-50 rounded-xl group-hover:scale-110 transition-transform">🎨</div>
+                        <div>
+                            <h3 class="font-bold text-stone-900 text-lg mb-1">Fun Themes</h3>
+                            <p class="text-stone-500 text-xs leading-relaxed">Pick from 7 popular flower palettes and the page will shift to that colour theme instantly.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="border-t border-stone-200 pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-stone-400">Diagnosis History Log</h2>
+                    <button onclick="clearHistory()" id="clearHistoryBtn" class="text-[11px] text-red-600 hover:underline hidden">Clear All Logs</button>
+                </div>
+                <div id="historyLogContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <p id="noHistoryText" class="text-stone-400 text-xs italic">No diagnostic history found. Scan a plant inside the Clinic to start logs.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="scanner-view" class="hidden max-w-xl w-full mx-auto space-y-6 animate-fadeIn py-4">
+            <button onclick="switchTab('home')" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 transition">
+                ← Back to Dashboard
+            </button>
+
+            <div class="text-center space-y-1">
+                <h1 class="text-3xl font-black text-stone-900 tracking-tight">Plant Recovery Clinic</h1>
+                <p class="text-stone-600 text-xs">Examine spots, stems, or leaves to generate a plain-text healing routine.</p>
+                <div class="mx-auto max-w-xl rounded-2xl bg-emerald-50 border border-emerald-100 p-4 text-left text-[11px] text-emerald-900">
+                    Tip: Take a new photo of the plant each day to track recovery progress and update the treatment plan.
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-md p-6 border border-stone-200 relative">
+                <div class="relative border-2 border-dashed border-teal-300 hover:border-teal-500 rounded-2xl p-8 text-center transition-all bg-teal-50/20 cursor-pointer group">
+                    <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImage(event)">
+                    
+                    <div id="uploadPrompt" class="space-y-2 pointer-events-none">
+                        <div class="text-4xl group-hover:scale-110 transition-transform duration-200">🌱</div>
+                        <p class="text-stone-800 font-bold text-sm">Snap or Upload Plant Condition</p>
+                    </div>
+                    
+                    <img id="imagePreview" class="hidden max-h-60 mx-auto rounded-xl shadow-md object-cover border-2 border-white" />
+                </div>
+
+                <button onclick="startRecoveryDiagnosis()" id="scanBtn" class="mt-5 w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                    <span>Analyze & Prescribe</span>
+                </button>
+            </div>
+
+            <div id="resultContainer" class="hidden bg-white rounded-3xl shadow-md p-6 border-t-4 border-emerald-600 space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-stone-100">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-lg">📋</span>
+                        <h2 class="font-bold text-stone-900">Botanical Treatment Protocol</h2>
+                    </div>
+                    <button onclick="copyToClipboard()" class="text-xs bg-stone-100 hover:bg-stone-200 px-2.5 py-1 rounded-lg text-stone-600 transition font-medium">📋 Copy Report</button>
+                </div>
+                <div id="resultText" class="text-stone-700 leading-relaxed text-sm whitespace-pre-line"></div>
+            </div>
+        </div>
+
+        <div id="fun-view" class="hidden max-w-4xl w-full mx-auto space-y-6 animate-fadeIn py-4">
+            <button onclick="switchTab('home')" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 transition">
+                ← Back to Dashboard
+            </button>
+
+            <div class="text-center space-y-2">
+                <h1 class="text-3xl font-black text-stone-900 tracking-tight">Fun Themes</h1>
+                <p class="text-stone-600 text-xs">Choose a flower, and the page will switch to its matching colour palette instantly. No AI, no API, no image input needed.</p>
+                <p id="themeIndicator" class="text-stone-500 text-xs">Selected: Default</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onclick="setFlowerTheme('rose')" class="theme-button bg-rose-50 border border-rose-100 text-rose-700 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌹</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Rose</h3>
+                            <p class="text-stone-500 text-xs">Soft pink glow for a romantic mood.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('sunflower')" class="theme-button bg-yellow-50 border border-yellow-100 text-yellow-800 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌻</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Sunflower</h3>
+                            <p class="text-stone-500 text-xs">Bright and warm yellow tones.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('lavender')" class="theme-button bg-violet-50 border border-violet-100 text-violet-700 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">💜</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Lavender</h3>
+                            <p class="text-stone-500 text-xs">Calming purple and soft pastels.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('orchid')" class="theme-button bg-fuchsia-50 border border-fuchsia-100 text-fuchsia-700 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">💐</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Orchid</h3>
+                            <p class="text-stone-500 text-xs">Elegant mauve and cream palette.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('daisy')" class="theme-button bg-lime-50 border border-lime-100 text-lime-800 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌼</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Daisy</h3>
+                            <p class="text-stone-500 text-xs">Fresh light yellow with bright green accents.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('tulip')" class="theme-button bg-orange-50 border border-orange-100 text-orange-800 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌷</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Tulip</h3>
+                            <p class="text-stone-500 text-xs">Warm coral and sunset shades.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('jasmine')" class="theme-button bg-amber-50 border border-amber-100 text-amber-800 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌼</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Jasmine</h3>
+                            <p class="text-stone-500 text-xs">Soft cream and gold tones for peace.</p>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const LOCAL_FLOWERS = {% if local_flowers_json %}{{ local_flowers_json | safe }}{% else %}{}{% endif %};
+        const TODAY_DATE = "{{ today_date }}";
+        const TODAY_FLOWER = "{{ today_flower }}";
+
+        const FLOWER_THEMES = {
+            rose: {
+                theme_name: 'Rose Glow',
+                primary_color: '#EC4899',
+                accent_color: '#F9A8D4',
+                background_color: 'linear-gradient(135deg, #FCE7F3 0%, #F43F5E 100%)',
+                banner_gradient: 'linear-gradient(to right, #BE185D 0%, #881577 100%)',
+                light_bg: '#FDF2F8',
+                text_color: '#BE185D'
+            },
+            sunflower: {
+                theme_name: 'Sunflower Warmth',
+                primary_color: '#F59E0B',
+                accent_color: '#FCD34D',
+                background_color: 'linear-gradient(135deg, #FEF3C7 0%, #FBBF24 100%)',
+                banner_gradient: 'linear-gradient(to right, #D97706 0%, #B45309 100%)',
+                light_bg: '#FFFBEB',
+                text_color: '#B45309'
+            },
+            lavender: {
+                theme_name: 'Lavender Breeze',
+                primary_color: '#8B5CF6',
+                accent_color: '#C4B5FD',
+                background_color: 'linear-gradient(135deg, #E9D5FF 0%, #A78BFA 100%)',
+                banner_gradient: 'linear-gradient(to right, #6D28D9 0%, #5B21B6 100%)',
+                light_bg: '#F3E8FF',
+                text_color: '#6D28D9'
+            },
+            orchid: {
+                theme_name: 'Orchid Elegance',
+                primary_color: '#C084FC',
+                accent_color: '#E9D5FF',
+                background_color: 'linear-gradient(135deg, #F5E0FF 0%, #C084FC 100%)',
+                banner_gradient: 'linear-gradient(to right, #9D4EDD 0%, #7B2CBF 100%)',
+                light_bg: '#FAF5FF',
+                text_color: '#7B2CBF'
+            },
+            daisy: {
+                theme_name: 'Daisy Fresh',
+                primary_color: '#FDE68A',
+                accent_color: '#A3E635',
+                background_color: 'linear-gradient(135deg, #ECFCCB 0%, #D9F99D 100%)',
+                banner_gradient: 'linear-gradient(to right, #CA8A04 0%, #78350F 100%)',
+                light_bg: '#FEFCE8',
+                text_color: '#78350F'
+            },
+            tulip: {
+                theme_name: 'Tulip Sunset',
+                primary_color: '#F97316',
+                accent_color: '#FB923C',
+                background_color: 'linear-gradient(135deg, #FFEDD5 0%, #F97316 100%)',
+                banner_gradient: 'linear-gradient(to right, #C2410C 0%, #92400E 100%)',
+                light_bg: '#FFF7ED',
+                text_color: '#92400E'
+            },
+            jasmine: {
+                theme_name: 'Jasmine Cream',
+                primary_color: '#FDE68A',
+                accent_color: '#FBBF24',
+                background_color: 'linear-gradient(135deg, #FEF9C3 0%, #FCD34D 100%)',
+                banner_gradient: 'linear-gradient(to right, #D97706 0%, #B45309 100%)',
+                light_bg: '#FFFBEB',
+                text_color: '#B45309'
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const dateLabel = document.getElementById('todayDateLabel');
+            const flowerLabel = document.getElementById('todayFlowerLabel');
+            const todayFlowerLink = document.getElementById('todayFlowerLink');
+            
+            if (dateLabel) dateLabel.innerText = TODAY_DATE;
+            if (flowerLabel) flowerLabel.innerText = TODAY_FLOWER;
+            
+            if (todayFlowerLink && TODAY_FLOWER !== "Loading...") {
+                todayFlowerLink.href = `https://www.google.com/search?q=${encodeURIComponent(TODAY_FLOWER + " flower")}`;
+            }
+
+            // โหลดประวัติการสแกนเก่าขึ้นมาแสดงตอนเปิดเว็บ
+            renderHistoryLogs();
+        });
+
+        function applyTheme(theme) {
+            if (!theme) return;
+            document.body.style.background = theme.background_color;
+            const welcomeBanner = document.getElementById('welcome-banner');
+            if (welcomeBanner) welcomeBanner.style.backgroundImage = theme.banner_gradient;
+            const nav = document.querySelector('nav');
+            if (nav) nav.style.backgroundColor = theme.primary_color;
+            const scanBtn = document.getElementById('scanBtn');
+            if (scanBtn) scanBtn.style.backgroundColor = theme.primary_color;
+            const resultContainer = document.getElementById('resultContainer');
+            if (resultContainer) resultContainer.style.borderColor = theme.accent_color;
+            const themeIndicator = document.getElementById('themeIndicator');
+            if (themeIndicator) themeIndicator.innerText = `Selected: ${theme.theme_name}`;
+            
+            // Keep welcome banner text white for readability
+            const h1 = document.querySelector('#welcome-banner h1');
+            if (h1) h1.style.color = 'white';
+            const descP = document.querySelector('#welcome-banner > div > p');
+            if (descP) descP.style.color = 'white';
+            
+            // Keep flower info box text white
+            const flowerSpan = document.querySelector('#welcome-banner span[class*="text"]');
+            if (flowerSpan) flowerSpan.style.color = 'white';
+            const flowerLabel = document.getElementById('todayFlowerLabel');
+            if (flowerLabel) flowerLabel.style.color = 'white';
+            const todayFlowerLink = document.getElementById('todayFlowerLink');
+            if (todayFlowerLink) todayFlowerLink.style.color = 'white';
+            const sourceP = document.querySelector('#welcome-banner p[class*="text-\\[11px\\]"]');
+            if (sourceP) sourceP.style.color = 'white';
+            const sourceLink = sourceP?.querySelector('a');
+            if (sourceLink) sourceLink.style.color = 'white';
+            
+            // Change all white/light boxes to theme light background
+            document.querySelectorAll('.bg-white').forEach(el => {
+                el.style.backgroundColor = theme.light_bg;
+            });
+            
+            // Change all emerald/green text elements to theme text color
+            document.querySelectorAll('[class*="text-emerald"], [class*="text-green"]').forEach(el => {
+                el.style.color = theme.text_color;
+            });
+            
+            // Change border colors from emerald/stone to theme accent
+            document.querySelectorAll('[class*="border-emerald"], [class*="hover:border-emerald"]').forEach(el => {
+                el.style.borderColor = theme.accent_color;
+            });
+            
+            // Change back button colors
+            document.querySelectorAll('button').forEach(btn => {
+                if (btn.textContent.includes('Back') || btn.textContent.includes('←')) {
+                    btn.style.color = theme.text_color;
+                }
+            });
+            
+            // Clear theme button ring
+            document.querySelectorAll('.theme-button').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-fuchsia-500');
+            });
+        }
+
+        function setFlowerTheme(name) {
+            const theme = FLOWER_THEMES[name];
+            if (!theme) return;
+            applyTheme(theme);
+            const button = document.querySelector(`button[onclick="setFlowerTheme('${name}')"]`);
+            if (button) button.classList.add('ring-2', 'ring-fuchsia-500');
+        }
+
+        function checkBirthFlower() {
+            const m = document.getElementById('searchMonth').value;
+            const d = document.getElementById('searchDay').value;
+            const resArea = document.getElementById('searchResult');
+            const linkEl = document.getElementById('flowerInfoLink');
+            
+            const flower = (LOCAL_FLOWERS[m] && LOCAL_FLOWERS[m][d]) ? LOCAL_FLOWERS[m][d] : "The Seasonal Heritage Blossom";
+            
+            linkEl.querySelector('span').innerText = flower;
+            linkEl.href = `https://www.google.com/search?q=${encodeURIComponent(flower + " flower")}`;
+            
+            resArea.classList.remove('hidden');
+        }
+
+        function switchTab(viewName) {
+            const homeView = document.getElementById('home-view');
+            const scannerView = document.getElementById('scanner-view');
+            const navHome = document.getElementById('nav-home');
+            const navScanner = document.getElementById('nav-scanner');
+            const navFun = document.getElementById('nav-fun');
+
+            if (viewName === 'home') {
+                homeView.classList.remove('hidden');
+                scannerView.classList.add('hidden');
+                document.getElementById('fun-view').classList.add('hidden');
+                navHome.className = "text-emerald-700 font-bold transition";
+                navScanner.className = "hover:text-emerald-900 transition";
+                navFun.className = "hover:text-emerald-900 transition";
+                renderHistoryLogs(); // รีโหลดประวัติอัปเดตบนหน้าโฮม
+            } else if (viewName === 'scanner') {
+                homeView.classList.add('hidden');
+                scannerView.classList.remove('hidden');
+                document.getElementById('fun-view').classList.add('hidden');
+                navHome.className = "hover:text-emerald-900 transition";
+                navScanner.className = "text-emerald-700 font-bold transition";
+                navFun.className = "hover:text-emerald-900 transition";
+            } else if (viewName === 'fun') {
+                homeView.classList.add('hidden');
+                scannerView.classList.add('hidden');
+                document.getElementById('fun-view').classList.remove('hidden');
+                navHome.className = "hover:text-emerald-900 transition";
+                navScanner.className = "hover:text-emerald-900 transition";
+                navFun.className = "text-emerald-700 font-bold transition";
+            }
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function() {
+                const preview = document.getElementById('imagePreview');
+                preview.src = reader.result;
+                preview.classList.remove('hidden');
+                document.getElementById('uploadPrompt').classList.add('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+
+        async function startRecoveryDiagnosis() {
+            const fileInput = document.getElementById('imageInput');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultText = document.getElementById('resultText');
+            const btn = document.getElementById('scanBtn');
+
+            if (!fileInput.files[0]) return alert("Please capture or supply a plant health photo first.");
+
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            btn.innerHTML = `Generating Prescription...`;
+            resultContainer.classList.add('hidden');
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                const response = await fetch('/identify', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error("Server fault.");
+                
+                const data = await response.json();
+                resultText.innerText = data.flower_info;
+                resultContainer.classList.remove('hidden');
+
+                // บันทึกผลการสแกนลง LocalStorage
+                saveToHistoryLog(data.flower_info);
+
+            } catch (error) {
+                resultText.innerText = "Network fault encountered. Please try again.";
+                resultContainer.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                btn.innerHTML = '<span>Analyze & Prescribe</span>';
+            }
+        }
+
+        // --- FUNCTIONS สำหรับฟีเจอร์ HISTORY LOGS & UTILITIES ---
+
+        function saveToHistoryLog(fullReport) {
+            let logs = JSON.parse(localStorage.getItem('flower_clinic_logs')) || [];
+            
+            // ดึงหัวข้อบรรทัดแรกมาตั้งเป็นชื่อประวัติย่อ (สกัดจากบรรทัดแรกที่ Gemini ตอบกลับมา)
+            const firstLine = fullReport.trim().split('\n')[0] || "Botanical Scan Report";
+            const shortTitle = firstLine.replace(/[#*:-]/g, '').trim();
+
+            const newLog = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('en-US', { hour12: false }),
+                title: shortTitle,
+                content: fullReport
+            };
+
+            logs.unshift(newLog); // นำประวัติล่าสุดขึ้นบนสุด
+            localStorage.setItem('flower_clinic_logs', JSON.stringify(logs));
+        }
+
+        function renderHistoryLogs() {
+            const container = document.getElementById('historyLogContainer');
+            const noHistoryText = document.getElementById('noHistoryText');
+            const clearBtn = document.getElementById('clearHistoryBtn');
+            const logs = JSON.parse(localStorage.getItem('flower_clinic_logs')) || [];
+
+            if (logs.length === 0) {
+                container.innerHTML = '';
+                container.appendChild(noHistoryText);
+                noHistoryText.classList.remove('hidden');
+                clearBtn.classList.add('hidden');
+                return;
+            }
+
+            noHistoryText.classList.add('hidden');
+            clearBtn.classList.remove('hidden');
+            container.innerHTML = '';
+
+            logs.forEach(log => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between space-y-3 animate-fadeIn";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between text-[10px] font-bold text-stone-400 uppercase tracking-wide">
+                            <span>🩺 Diagnosis Report</span>
+                            <span>${log.timestamp}</span>
+                        </div>
+                        <h4 class="font-bold text-stone-900 text-sm mt-1 line-clamp-1">${log.title}</h4>
+                        <p class="text-stone-500 text-xs mt-1.5 line-clamp-3 whitespace-pre-line">${log.content}</p>
+                    </div>
+                    <button onclick="viewOldLog('${encodeURIComponent(JSON.stringify(log))}')" class="text-xs font-semibold text-emerald-700 hover:text-emerald-900 text-left flex items-center gap-0.5 pt-1">
+                        Read Full Protocol →
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function viewOldLog(encodedLogData) {
+            const log = JSON.parse(decodeURIComponent(encodedLogData));
+            switchTab('scanner');
+            
+            // นำประวัติเก่ามาวาดลงในกล่องผลลัพธ์ของคลินิกทันที
+            document.getElementById('resultText').innerText = log.content;
+            document.getElementById('resultContainer').classList.remove('hidden');
+            document.getElementById('uploadPrompt').classList.add('hidden');
+            document.getElementById('imagePreview').classList.add('hidden');
+        }
+
+        function clearHistory() {
+            if (confirm("Are you sure you want to wipe all diagnostic logs?")) {
+                localStorage.removeItem('flower_clinic_logs');
+                renderHistoryLogs();
+            }
+        }
+
+        function copyToClipboard() {
+            const textToCopy = document.getElementById('resultText').innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("📋 Diagnostic report copied to clipboard!");
+            }).catch(() => {
+                alert("Failed to copy text.");
+            });
+        }
+    </script>
+</body>
+</html>
