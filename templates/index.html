@@ -22,7 +22,7 @@
         <div class="flex items-center gap-6 text-sm font-semibold text-stone-600">
             <button onclick="switchTab('home')" id="nav-home" class="text-emerald-700 font-bold transition">Dashboard</button>
             <button onclick="switchTab('scanner')" id="nav-scanner" class="hover:text-emerald-900 transition">Clinic Scanner</button>
-            <button onclick="switchTab('fun')" id="nav-fun" class="hover:text-emerald-900 transition">Fun Themes</button>
+            <button onclick="switchTab('fun')" id="nav-fun" class="hover:text-emerald-900 transition">Fun</button>
         </div>
     </nav>
 
@@ -98,8 +98,8 @@
                     <div onclick="switchTab('fun')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md hover:border-fuchsia-300 transition cursor-pointer flex gap-4 items-start group">
                         <div class="text-3xl p-3 bg-fuchsia-50 rounded-xl group-hover:scale-110 transition-transform">🎨</div>
                         <div>
-                            <h3 class="font-bold text-stone-900 text-lg mb-1">Fun Themes</h3>
-                            <p class="text-stone-500 text-xs leading-relaxed">Pick from 7 popular flower palettes and the page will shift to that colour theme instantly.</p>
+                            <h3 class="font-bold text-stone-900 text-lg mb-1">Fun</h3>
+                            <p class="text-stone-500 text-xs leading-relaxed">Open the Fun hub to explore themes and see today’s flower quote.</p>
                         </div>
                     </div>
 
@@ -170,9 +170,13 @@
             </button>
 
             <div class="text-center space-y-2">
-                <h1 class="text-3xl font-black text-stone-900 tracking-tight">Fun Themes</h1>
-                <p class="text-stone-600 text-xs">Choose a flower, and the page will switch to its matching colour palette instantly.</p>
+                <h1 class="text-3xl font-black text-stone-900 tracking-tight">Fun</h1>
+                <p class="text-stone-600 text-xs">Choose a flower palette and enjoy today’s flower quote.</p>
                 <p id="themeIndicator" class="text-stone-500 text-xs">Selected: Default</p>
+                <div class="mt-3 rounded-3xl bg-white/90 border border-stone-200 p-5 text-left shadow-sm">
+                    <div class="text-[10px] font-bold uppercase tracking-wide text-stone-500 mb-2">คำคมดอกไม้ประจำวัน</div>
+                    <p class="text-stone-800 text-sm">"Roses are red, violets are blue, Bluetooth is searching, and I found you."</p>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
