@@ -103,6 +103,14 @@
                         </div>
                     </div>
 
+                    <div onclick="switchTab('scanner'); setScanMode('uma')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md hover:border-fuchsia-300 transition cursor-pointer flex gap-4 items-start group">
+                        <div class="text-3xl p-3 bg-orange-50 rounded-xl group-hover:scale-110 transition-transform">🐎</div>
+                        <div>
+                            <h3 class="font-bold text-stone-900 text-lg mb-1">Uma Finder</h3>
+                            <p class="text-stone-500 text-xs leading-relaxed">Analyze an image and tell which Uma Musume character it is.</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -129,6 +137,7 @@
                     <button id="recoverModeBtn" onclick="setScanMode('recover')" class="px-4 py-2 rounded-full bg-emerald-700 text-white text-[11px] font-semibold transition hover:bg-emerald-800">Recovery</button>
                     <button id="identifyModeBtn" onclick="setScanMode('identify')" class="px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200">Flower Scanner</button>
                     <button id="nearestModeBtn" onclick="setScanMode('nearest')" class="px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200">Garden Finder</button>
+                    <button id="umaModeBtn" onclick="setScanMode('uma')" class="px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200">Uma Finder</button>
                 </div>
                 <div class="mx-auto max-w-xl rounded-2xl bg-emerald-50 border border-emerald-100 p-4 text-left text-[11px] text-emerald-900">
                     Tip: Take a new photo of the plant each day to track recovery progress and update the treatment plan.
@@ -243,6 +252,17 @@
                         </div>
                     </div>
                 </button>
+            </div>
+
+            <div class="mt-4 p-6 rounded-3xl bg-slate-50 border border-slate-200 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <div class="text-[10px] font-semibold uppercase tracking-wide text-stone-500 mb-2">Fun Subfeature</div>
+                        <h3 class="text-lg font-bold text-stone-900">Uma Finder</h3>
+                        <p class="text-stone-500 text-xs">Send an image to identify which Uma Musume character appears.</p>
+                    </div>
+                    <button onclick="switchTab('scanner'); setScanMode('uma')" class="bg-orange-700 hover:bg-orange-800 text-white text-xs font-bold px-4 py-2 rounded-full transition">Go to Uma Finder</button>
+                </div>
             </div>
 
             <div class="mt-6 flex justify-center">
@@ -416,28 +436,33 @@
             const recoverBtn = document.getElementById('recoverModeBtn');
             const identifyBtn = document.getElementById('identifyModeBtn');
             const nearestBtn = document.getElementById('nearestModeBtn');
+            const umaBtn = document.getElementById('umaModeBtn');
             const heading = document.getElementById('scannerHeading');
             const description = document.getElementById('scannerDescription');
             const scanBtn = document.getElementById('scanBtn');
 
+            recoverBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
+            identifyBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
+            nearestBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
+            umaBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
+
             if (mode === 'identify') {
-                recoverBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
                 identifyBtn.className = 'px-4 py-2 rounded-full bg-cyan-700 text-white text-[11px] font-semibold transition hover:bg-cyan-800';
-                nearestBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
                 heading.innerText = 'Flower Scanner';
                 description.innerText = 'Upload a plant image and detect the flower type only.';
                 scanBtn.innerHTML = '<span>Identify Flower</span>';
             } else if (mode === 'nearest') {
-                recoverBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
-                identifyBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
                 nearestBtn.className = 'px-4 py-2 rounded-full bg-sky-700 text-white text-[11px] font-semibold transition hover:bg-sky-800';
                 heading.innerText = 'Flower Garden Finder';
                 description.innerText = 'Allow location access and upload the flower photo to locate nearby gardens or floral spots.';
                 scanBtn.innerHTML = '<span>Find Nearby Garden</span>';
+            } else if (mode === 'uma') {
+                umaBtn.className = 'px-4 py-2 rounded-full bg-orange-700 text-white text-[11px] font-semibold transition hover:bg-orange-800';
+                heading.innerText = 'Uma Finder';
+                description.innerText = 'Upload an image and identify the Uma Musume character by name.';
+                scanBtn.innerHTML = '<span>Identify Uma Musume</span>';
             } else {
                 recoverBtn.className = 'px-4 py-2 rounded-full bg-emerald-700 text-white text-[11px] font-semibold transition hover:bg-emerald-800';
-                identifyBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
-                nearestBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
                 heading.innerText = 'Plant Recovery Clinic';
                 description.innerText = 'Examine spots, stems, or leaves to generate a plain-text healing routine.';
                 scanBtn.innerHTML = '<span>Analyze & Prescribe</span>';
@@ -458,6 +483,8 @@
                 btn.innerHTML = 'Identifying Flower...';
             } else if (SCAN_MODE === 'nearest') {
                 btn.innerHTML = 'Finding Nearby Garden...';
+            } else if (SCAN_MODE === 'uma') {
+                btn.innerHTML = 'Identifying Uma Musume...';
             } else {
                 btn.innerHTML = 'Generating Prescription...';
             }
@@ -479,7 +506,9 @@
             }
 
             try {
-                const endpoint = SCAN_MODE === 'identify' ? '/identify-type' : (SCAN_MODE === 'nearest' ? '/find-nearest' : '/identify');
+                const endpoint = SCAN_MODE === 'identify'
+                    ? '/identify-type'
+                    : (SCAN_MODE === 'nearest' ? '/find-nearest' : (SCAN_MODE === 'uma' ? '/identify-uma' : '/identify'));
                 const response = await fetch(endpoint, { method: 'POST', body: formData });
                 if (!response.ok) throw new Error("Server fault.");
                 const data = await response.json();
@@ -488,6 +517,8 @@
                     resultText.innerText = `Flower type: ${data.flower_info}`;
                 } else if (SCAN_MODE === 'nearest') {
                     resultText.innerText = `Nearby place: ${data.flower_info}`;
+                } else if (SCAN_MODE === 'uma') {
+                    resultText.innerText = `Uma Musume: ${data.flower_info}`;
                 } else {
                     resultText.innerText = data.flower_info;
                 }
@@ -503,6 +534,8 @@
                     btn.innerHTML = '<span>Identify Flower</span>';
                 } else if (SCAN_MODE === 'nearest') {
                     btn.innerHTML = '<span>Find Nearby Garden</span>';
+                } else if (SCAN_MODE === 'uma') {
+                    btn.innerHTML = '<span>Identify Uma Musume</span>';
                 } else {
                     btn.innerHTML = '<span>Analyze & Prescribe</span>';
                 }

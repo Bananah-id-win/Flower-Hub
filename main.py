@@ -117,3 +117,27 @@ async def identify_flower_type(file: UploadFile = File(...)):
     )
     flower_info = response.text.strip()
     return {"flower_info": flower_info}
+
+@app.post("/identify-uma")
+async def identify_uma_musume(file: UploadFile = File(...)):
+    image_bytes = await file.read()
+    
+    uma_prompt = (
+        "Analyze the provided image and identify which Uma Musume character is shown.\n"
+        "Answer with the character name only.\n"
+        "Do not describe plants, flowers, or any other unrelated details.\n"
+        "If the image is not clearly an Uma Musume character, respond with 'Unknown Uma Musume'."
+    )
+
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=[
+            types.Part.from_bytes(
+                data=image_bytes,
+                mime_type="image/jpeg"
+            ),
+            uma_prompt
+        ]
+    )
+    flower_info = response.text.strip()
+    return {"flower_info": flower_info}
