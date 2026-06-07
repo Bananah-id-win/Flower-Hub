@@ -118,14 +118,15 @@ async def identify_flower_type(file: UploadFile = File(...)):
     flower_info = response.text.strip()
     return {"flower_info": flower_info}
 
-@app.post("/identify-uma")
-async def identify_uma_musume(file: UploadFile = File(...)):
+@app.post("/identify-HSR")
+async def identify_HSR_musume(file: UploadFile = File(...)):
     image_bytes = await file.read()
     
-    uma_prompt = (
+    HSR_prompt = (
         "Analyze the provided image and identify which honkai star rail character is shown.\n"
         "Answer with the character name only.\n"
         "Do not describe plants, flowers, or any other unrelated details.\n"
+        "Respond in plain text only with the character name."
     )
 
     response = client.models.generate_content(
@@ -135,8 +136,8 @@ async def identify_uma_musume(file: UploadFile = File(...)):
                 data=image_bytes,
                 mime_type="image/jpeg"
             ),
-            uma_prompt
+            HSR_prompt
         ]
     )
-    flower_info = response.text.strip()
-    return {"flower_info": flower_info}
+    HSR_info = response.text.strip()
+    return {"HSR_info": HSR_info}
