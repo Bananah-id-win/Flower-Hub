@@ -66,6 +66,14 @@
                         </div>
                     </div>
 
+                    <div onclick="switchTab('scanner'); setScanMode('nearest')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md hover:border-sky-300 transition cursor-pointer flex gap-4 items-start group">
+                        <div class="text-3xl p-3 bg-sky-50 rounded-xl group-hover:scale-110 transition-transform">📍</div>
+                        <div>
+                            <h3 class="font-bold text-stone-900 text-lg mb-1">Flower Garden Finder</h3>
+                            <p class="text-stone-500 text-xs leading-relaxed">Send a flower photo and allow location access to discover nearby gardens or flower spots.</p>
+                        </div>
+                    </div>
+
                     <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex gap-4 items-start">
                         <div class="text-3xl p-3 bg-amber-50 rounded-xl">🎂</div>
                         <div class="space-y-2 w-full">
@@ -120,6 +128,7 @@
                 <div class="flex justify-center gap-2">
                     <button id="recoverModeBtn" onclick="setScanMode('recover')" class="px-4 py-2 rounded-full bg-emerald-700 text-white text-[11px] font-semibold transition hover:bg-emerald-800">Recovery</button>
                     <button id="identifyModeBtn" onclick="setScanMode('identify')" class="px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200">Flower Scanner</button>
+                    <button id="nearestModeBtn" onclick="setScanMode('nearest')" class="px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200">Garden Finder</button>
                 </div>
                 <div class="mx-auto max-w-xl rounded-2xl bg-emerald-50 border border-emerald-100 p-4 text-left text-[11px] text-emerald-900">
                     Tip: Take a new photo of the plant each day to track recovery progress and update the treatment plan.
@@ -402,6 +411,7 @@
             SCAN_MODE = mode;
             const recoverBtn = document.getElementById('recoverModeBtn');
             const identifyBtn = document.getElementById('identifyModeBtn');
+            const nearestBtn = document.getElementById('nearestModeBtn');
             const heading = document.getElementById('scannerHeading');
             const description = document.getElementById('scannerDescription');
             const scanBtn = document.getElementById('scanBtn');
@@ -409,12 +419,21 @@
             if (mode === 'identify') {
                 recoverBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
                 identifyBtn.className = 'px-4 py-2 rounded-full bg-cyan-700 text-white text-[11px] font-semibold transition hover:bg-cyan-800';
+                nearestBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
                 heading.innerText = 'Flower Scanner';
                 description.innerText = 'Upload a plant image and detect the flower type only.';
                 scanBtn.innerHTML = '<span>Identify Flower</span>';
+            } else if (mode === 'nearest') {
+                recoverBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
+                identifyBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
+                nearestBtn.className = 'px-4 py-2 rounded-full bg-sky-700 text-white text-[11px] font-semibold transition hover:bg-sky-800';
+                heading.innerText = 'Flower Garden Finder';
+                description.innerText = 'Allow location access and upload the flower photo to locate nearby gardens or floral spots.';
+                scanBtn.innerHTML = '<span>Find Nearby Garden</span>';
             } else {
                 recoverBtn.className = 'px-4 py-2 rounded-full bg-emerald-700 text-white text-[11px] font-semibold transition hover:bg-emerald-800';
                 identifyBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
+                nearestBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
                 heading.innerText = 'Plant Recovery Clinic';
                 description.innerText = 'Examine spots, stems, or leaves to generate a plain-text healing routine.';
                 scanBtn.innerHTML = '<span>Analyze & Prescribe</span>';
@@ -431,19 +450,43 @@
 
             btn.disabled = true;
             btn.classList.add('opacity-75', 'cursor-not-allowed');
-            btn.innerHTML = SCAN_MODE === 'identify' ? 'Identifying Flower...' : 'Generating Prescription...';
+            if (SCAN_MODE === 'identify') {
+                btn.innerHTML = 'Identifying Flower...';
+            } else if (SCAN_MODE === 'nearest') {
+                btn.innerHTML = 'Finding Nearby Garden...';
+            } else {
+                btn.innerHTML = 'Generating Prescription...';
+            }
             resultContainer.classList.add('hidden');
 
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
 
+            if (SCAN_MODE === 'nearest') {
+                const locationData = await getLocation();
+                if (!locationData) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    btn.innerHTML = '<span>Find Nearby Garden</span>';
+                    return;
+                }
+                formData.append('latitude', locationData.latitude);
+                formData.append('longitude', locationData.longitude);
+            }
+
             try {
-                const endpoint = SCAN_MODE === 'identify' ? '/identify-type' : '/identify';
+                const endpoint = SCAN_MODE === 'identify' ? '/identify-type' : (SCAN_MODE === 'nearest' ? '/find-nearest' : '/identify');
                 const response = await fetch(endpoint, { method: 'POST', body: formData });
                 if (!response.ok) throw new Error("Server fault.");
                 const data = await response.json();
 
-                resultText.innerText = SCAN_MODE === 'identify' ? `Flower type: ${data.flower_info}` : data.flower_info;
+                if (SCAN_MODE === 'identify') {
+                    resultText.innerText = `Flower type: ${data.flower_info}`;
+                } else if (SCAN_MODE === 'nearest') {
+                    resultText.innerText = `Nearby place: ${data.flower_info}`;
+                } else {
+                    resultText.innerText = data.flower_info;
+                }
                 resultContainer.classList.remove('hidden');
                 saveToHistoryLog(resultText.innerText);
             } catch (error) {
@@ -454,10 +497,36 @@
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');
                 if (SCAN_MODE === 'identify') {
                     btn.innerHTML = '<span>Identify Flower</span>';
+                } else if (SCAN_MODE === 'nearest') {
+                    btn.innerHTML = '<span>Find Nearby Garden</span>';
                 } else {
                     btn.innerHTML = '<span>Analyze & Prescribe</span>';
                 }
             }
+        }
+
+        async function getLocation() {
+            return new Promise((resolve) => {
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported in this browser.');
+                    resolve(null);
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        resolve({
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        });
+                    },
+                    (error) => {
+                        alert('Location permission is required to find nearby flower gardens.');
+                        resolve(null);
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            });
         }
         function restoreOriginalTheme() {
             // Reset body background

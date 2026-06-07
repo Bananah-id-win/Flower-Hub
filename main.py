@@ -1,5 +1,5 @@
 # main.py
-from fastapi import FastAPI, UploadFile, File, Request
+from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from google import genai
@@ -65,7 +65,36 @@ async def identify_flower(file: UploadFile = File(...)):
     )
     flower_info = response.text.strip()
     return {"flower_info": flower_info}
+@app.post("/find-nearest")
+async def find_nearest_flower_garden(
+    file: UploadFile = File(...),
+    latitude: str = Form(None),
+    longitude: str = Form(None)
+):
+    image_bytes = await file.read()
 
+    location_note = ''
+    if latitude and longitude:
+        location_note = f"Use the user's approximate location: latitude {latitude}, longitude {longitude}."
+
+    nearest_prompt = (
+        f"Identify the flower in the provided photo and then suggest the nearest public flower garden, botanical garden, or park where this flower can likely be found near the user's location.\n"
+        f"{location_note}\n"
+        "Do not provide care instructions or diagnosis. Keep the answer concise and relevant to nearby flower spots."
+    )
+
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=[
+            types.Part.from_bytes(
+                data=image_bytes,
+                mime_type="image/jpeg"
+            ),
+            nearest_prompt
+        ]
+    )
+    flower_info = response.text.strip()
+    return {"flower_info": flower_info}
 @app.post("/identify-type")
 async def identify_flower_type(file: UploadFile = File(...)):
     image_bytes = await file.read()
