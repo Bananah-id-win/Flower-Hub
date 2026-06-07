@@ -218,6 +218,15 @@
                         </div>
                     </div>
                 </button>
+                <button onclick="resetTheme()" class="theme-button col-span-1 sm:col-span-2 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 text-emerald-700 rounded-3xl p-5 text-center shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="text-2xl">✨</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Reset to Normal</h3>
+                            <p class="text-stone-500 text-xs">Return to the default theme.</p>
+                        </div>
+                    </div>
+                </button>
             </div>
         </div>
 
@@ -377,7 +386,71 @@
             const button = document.querySelector(`button[onclick="setFlowerTheme('${name}')"]`);
             if (button) button.classList.add('ring-2', 'ring-fuchsia-500');
         }
-
+        function resetTheme() {
+            // Restore original/default colors
+            const defaultTheme = {
+                theme_name: 'Default',
+                primary_color: 'transparent',
+                background_color: 'linear-gradient(to br, rgb(245, 245, 244) via-transparent/20, rgb(236, 241, 251) to-transparent)',
+                banner_gradient: 'linear-gradient(to right, rgb(6, 78, 59) 0%, rgb(12, 74, 110) 100%)',
+                light_bg: 'white',
+                text_color: '#059669'
+            };
+            
+            // Restore body background
+            document.body.style.background = defaultTheme.background_color;
+            
+            // Restore navbar
+            const nav = document.querySelector('nav');
+            if (nav) nav.style.backgroundColor = 'white';
+            
+            // Restore welcome banner
+            const welcomeBanner = document.getElementById('welcome-banner');
+            if (welcomeBanner) welcomeBanner.style.backgroundImage = defaultTheme.banner_gradient;
+            
+            // Restore white boxes
+            document.querySelectorAll('.bg-white').forEach(el => {
+                el.style.backgroundColor = 'white';
+            });
+            
+            // Restore green text
+            document.querySelectorAll('[class*="text-emerald"], [class*="text-green"]').forEach(el => {
+                el.style.color = '';
+            });
+            
+            // Restore emerald borders
+            document.querySelectorAll('[class*="border-emerald"]').forEach(el => {
+                el.style.borderColor = '';
+            });
+            
+            // Restore scan button
+            const scanBtn = document.getElementById('scanBtn');
+            if (scanBtn) scanBtn.style.backgroundColor = 'rgb(5, 150, 105)';
+            
+            // Restore result container border
+            const resultContainer = document.getElementById('resultContainer');
+            if (resultContainer) resultContainer.style.borderColor = '';
+            
+            // Restore back button colors
+            document.querySelectorAll('button').forEach(btn => {
+                if (btn.textContent.includes('Back') || btn.textContent.includes('←')) {
+                    btn.style.color = '';
+                }
+            });
+            
+            // Restore theme indicator
+            const themeIndicator = document.getElementById('themeIndicator');
+            if (themeIndicator) themeIndicator.innerText = 'Selected: Default';
+            
+            // Remove ring from all theme buttons
+            document.querySelectorAll('.theme-button').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-fuchsia-500');
+            });
+            
+            // Add ring to reset button
+            const resetBtn = document.querySelector('button[onclick="resetTheme()"]');
+            if (resetBtn) resetBtn.classList.add('ring-2', 'ring-fuchsia-500');
+        }
         function checkBirthFlower() {
             const m = document.getElementById('searchMonth').value;
             const d = document.getElementById('searchDay').value;
