@@ -123,10 +123,9 @@ async def identify_uma_musume(file: UploadFile = File(...)):
     image_bytes = await file.read()
     
     uma_prompt = (
-        "Analyze the provided image and identify which Uma Musume character is shown.\n"
+        "Analyze the provided image and identify which honkai star rail character is shown.\n"
         "Answer with the character name only.\n"
         "Do not describe plants, flowers, or any other unrelated details.\n"
-        "If the image is not clearly an Uma Musume character, respond with 'Unknown Uma Musume'."
     )
 
     response = client.models.generate_content(
