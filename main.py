@@ -65,3 +65,26 @@ async def identify_flower(file: UploadFile = File(...)):
     )
     flower_info = response.text.strip()
     return {"flower_info": flower_info}
+
+@app.post("/identify-type")
+async def identify_flower_type(file: UploadFile = File(...)):
+    image_bytes = await file.read()
+    
+    type_prompt = (
+        "Analyze the photo and identify the flower species or common flower name only.\n"
+        "Do not give care instructions, diagnosis, or additional commentary.\n"
+        "Respond in plain text only with the flower type/name."
+    )
+
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=[
+            types.Part.from_bytes(
+                data=image_bytes,
+                mime_type="image/jpeg"
+            ),
+            type_prompt
+        ]
+    )
+    flower_info = response.text.strip()
+    return {"flower_info": flower_info}

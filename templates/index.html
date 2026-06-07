@@ -50,11 +50,19 @@
                 <h2 class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-4">Available Hub Sub-Features</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     
-                    <div onclick="switchTab('scanner')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition cursor-pointer flex gap-4 items-start group">
+                    <div onclick="switchTab('scanner'); setScanMode('recover')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition cursor-pointer flex gap-4 items-start group">
                         <div class="text-3xl p-3 bg-emerald-50 rounded-xl group-hover:scale-110 transition-transform">🩺</div>
                         <div>
                             <h3 class="font-bold text-stone-900 text-lg mb-1">Plant Recovery Clinic</h3>
                             <p class="text-stone-500 text-xs leading-relaxed">Examine wilting tissues, diagnose pathogen symptoms, and get custom healing instructions.</p>
+                        </div>
+                    </div>
+
+                    <div onclick="switchTab('scanner'); setScanMode('identify')" class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md hover:border-cyan-300 transition cursor-pointer flex gap-4 items-start group">
+                        <div class="text-3xl p-3 bg-cyan-50 rounded-xl group-hover:scale-110 transition-transform">🔍</div>
+                        <div>
+                            <h3 class="font-bold text-stone-900 text-lg mb-1">Flower Scanner</h3>
+                            <p class="text-stone-500 text-xs leading-relaxed">Upload a plant image and get only the flower type, without care instructions.</p>
                         </div>
                     </div>
 
@@ -107,8 +115,12 @@
             </button>
 
             <div class="text-center space-y-1">
-                <h1 class="text-3xl font-black text-stone-900 tracking-tight">Plant Recovery Clinic</h1>
-                <p class="text-stone-600 text-xs">Examine spots, stems, or leaves to generate a plain-text healing routine.</p>
+                <h1 id="scannerHeading" class="text-3xl font-black text-stone-900 tracking-tight">Plant Recovery Clinic</h1>
+                <p id="scannerDescription" class="text-stone-600 text-xs">Examine spots, stems, or leaves to generate a plain-text healing routine.</p>
+                <div class="flex justify-center gap-2">
+                    <button id="recoverModeBtn" onclick="setScanMode('recover')" class="px-4 py-2 rounded-full bg-emerald-700 text-white text-[11px] font-semibold transition hover:bg-emerald-800">Recovery</button>
+                    <button id="identifyModeBtn" onclick="setScanMode('identify')" class="px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200">Flower Scanner</button>
+                </div>
                 <div class="mx-auto max-w-xl rounded-2xl bg-emerald-50 border border-emerald-100 p-4 text-left text-[11px] text-emerald-900">
                     Tip: Take a new photo of the plant each day to track recovery progress and update the treatment plan.
                 </div>
@@ -126,7 +138,7 @@
                     <img id="imagePreview" class="hidden max-h-60 mx-auto rounded-xl shadow-md object-cover border-2 border-white" />
                 </div>
 
-                <button onclick="startRecoveryDiagnosis()" id="scanBtn" class="mt-5 w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                <button onclick="startScan()" id="scanBtn" class="mt-5 w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl transition-all transform active:scale-95 flex items-center justify-center gap-2">
                     <span>Analyze & Prescribe</span>
                 </button>
             </div>
@@ -233,6 +245,7 @@
         const LOCAL_FLOWERS = {% if local_flowers_json %}{{ local_flowers_json | safe }}{% else %}{}{% endif %};
         const TODAY_DATE = "{{ today_date }}";
         const TODAY_FLOWER = "{{ today_flower }}";
+        let SCAN_MODE = 'recover';
 
         const FLOWER_THEMES = {
             rose: {
@@ -312,6 +325,7 @@
                 todayFlowerLink.href = `https://www.google.com/search?q=${encodeURIComponent(TODAY_FLOWER + " flower")}`;
             }
 
+            setScanMode('recover');
             // โหลดประวัติการสแกนเก่าขึ้นมาแสดงตอนเปิดเว็บ
             renderHistoryLogs();
         });
@@ -382,6 +396,68 @@
             applyTheme(theme);
             const button = document.querySelector(`button[onclick="setFlowerTheme('${name}')"]`);
             if (button) button.classList.add('ring-2', 'ring-fuchsia-500');
+        }
+
+        function setScanMode(mode) {
+            SCAN_MODE = mode;
+            const recoverBtn = document.getElementById('recoverModeBtn');
+            const identifyBtn = document.getElementById('identifyModeBtn');
+            const heading = document.getElementById('scannerHeading');
+            const description = document.getElementById('scannerDescription');
+            const scanBtn = document.getElementById('scanBtn');
+
+            if (mode === 'identify') {
+                recoverBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
+                identifyBtn.className = 'px-4 py-2 rounded-full bg-cyan-700 text-white text-[11px] font-semibold transition hover:bg-cyan-800';
+                heading.innerText = 'Flower Scanner';
+                description.innerText = 'Upload a plant image and detect the flower type only.';
+                scanBtn.innerHTML = '<span>Identify Flower</span>';
+            } else {
+                recoverBtn.className = 'px-4 py-2 rounded-full bg-emerald-700 text-white text-[11px] font-semibold transition hover:bg-emerald-800';
+                identifyBtn.className = 'px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200';
+                heading.innerText = 'Plant Recovery Clinic';
+                description.innerText = 'Examine spots, stems, or leaves to generate a plain-text healing routine.';
+                scanBtn.innerHTML = '<span>Analyze & Prescribe</span>';
+            }
+        }
+
+        async function startScan() {
+            const fileInput = document.getElementById('imageInput');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultText = document.getElementById('resultText');
+            const btn = document.getElementById('scanBtn');
+
+            if (!fileInput.files[0]) return alert("Please capture or supply a plant health photo first.");
+
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            btn.innerHTML = SCAN_MODE === 'identify' ? 'Identifying Flower...' : 'Generating Prescription...';
+            resultContainer.classList.add('hidden');
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                const endpoint = SCAN_MODE === 'identify' ? '/identify-type' : '/identify';
+                const response = await fetch(endpoint, { method: 'POST', body: formData });
+                if (!response.ok) throw new Error("Server fault.");
+                const data = await response.json();
+
+                resultText.innerText = SCAN_MODE === 'identify' ? `Flower type: ${data.flower_info}` : data.flower_info;
+                resultContainer.classList.remove('hidden');
+                saveToHistoryLog(resultText.innerText);
+            } catch (error) {
+                resultText.innerText = "Network fault encountered. Please try again.";
+                resultContainer.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                if (SCAN_MODE === 'identify') {
+                    btn.innerHTML = '<span>Identify Flower</span>';
+                } else {
+                    btn.innerHTML = '<span>Analyze & Prescribe</span>';
+                }
+            }
         }
         function restoreOriginalTheme() {
             // Reset body background
@@ -508,43 +584,6 @@
                 document.getElementById('uploadPrompt').classList.add('hidden');
             }
             reader.readAsDataURL(file);
-        }
-
-        async function startRecoveryDiagnosis() {
-            const fileInput = document.getElementById('imageInput');
-            const resultContainer = document.getElementById('resultContainer');
-            const resultText = document.getElementById('resultText');
-            const btn = document.getElementById('scanBtn');
-
-            if (!fileInput.files[0]) return alert("Please capture or supply a plant health photo first.");
-
-            btn.disabled = true;
-            btn.classList.add('opacity-75', 'cursor-not-allowed');
-            btn.innerHTML = `Generating Prescription...`;
-            resultContainer.classList.add('hidden');
-
-            const formData = new FormData();
-            formData.append("file", fileInput.files[0]);
-
-            try {
-                const response = await fetch('/identify', { method: 'POST', body: formData });
-                if (!response.ok) throw new Error("Server fault.");
-                
-                const data = await response.json();
-                resultText.innerText = data.flower_info;
-                resultContainer.classList.remove('hidden');
-
-                // บันทึกผลการสแกนลง LocalStorage
-                saveToHistoryLog(data.flower_info);
-
-            } catch (error) {
-                resultText.innerText = "Network fault encountered. Please try again.";
-                resultContainer.classList.remove('hidden');
-            } finally {
-                btn.disabled = false;
-                btn.classList.remove('opacity-75', 'cursor-not-allowed');
-                btn.innerHTML = '<span>Analyze & Prescribe</span>';
-            }
         }
 
         // --- FUNCTIONS สำหรับฟีเจอร์ HISTORY LOGS & UTILITIES ---
