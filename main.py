@@ -1,3 +1,4 @@
+# main.py
 from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -5,29 +6,27 @@ from google import genai
 from google.genai import types
 from datetime import datetime
 import json
-import os
+import os  # เพิ่มเข้ามาเพื่อดึงข้อมูลระบบ Environment Variable
 
 from data.birthday_data import BIRTHDAY_FLOWERS
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# Initialize Gemini Client using system environment variables
+# ดึงค่า API Key จากระบบ Environment Variable ของ Render เพื่อความปลอดภัยสูงสุด
 api_key_env = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key_env)
 
 
 def get_flower_for_date(month: str, day: str) -> str:
-    """Retrieve birth flower for a given month and day string from all 12 months."""
     month_data = BIRTHDAY_FLOWERS.get(month, {})
     return month_data.get(day, "The Seasonal Heritage Blossom")
-
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui(request: Request):
     now = datetime.now()
-    current_month_name = now.strftime("%B")  # e.g., "January", "June"
-    current_day_str = str(now.day)            # e.g., "7", "21"
+    current_month_name = now.strftime("%B") 
+    current_day_str = str(now.day)          
     
     today_flower = get_flower_for_date(current_month_name, current_day_str)
     today_date_display = f"{current_month_name} {current_day_str}"
@@ -38,7 +37,6 @@ async def serve_ui(request: Request):
         "today_flower": today_flower,
         "local_flowers_json": json.dumps(BIRTHDAY_FLOWERS)
     })
-
 
 @app.post("/identify")
 async def identify_flower(file: UploadFile = File(...)):
@@ -54,20 +52,19 @@ async def identify_flower(file: UploadFile = File(...)):
         "Do not use markdown, asterisks, or headings. Use simple numbered lines and line breaks only."
     )
     
+    # กำหนดพารามิเตอร์แบบชัดเจน (data=..., mime_type=...) ป้องกันการประมวลผลติดขัด
     response = client.models.generate_content(
         model='gemini-2.5-flash',
         contents=[
             types.Part.from_bytes(
                 data=image_bytes, 
-                mime_type=file.content_type or "image/jpeg"
+                mime_type="image/jpeg"
             ),
             recovery_prompt
         ]
     )
     flower_info = response.text.strip()
     return {"flower_info": flower_info}
-
-
 @app.post("/find-nearest")
 async def find_nearest_flower_garden(
     file: UploadFile = File(...),
@@ -91,15 +88,13 @@ async def find_nearest_flower_garden(
         contents=[
             types.Part.from_bytes(
                 data=image_bytes,
-                mime_type=file.content_type or "image/jpeg"
+                mime_type="image/jpeg"
             ),
             nearest_prompt
         ]
     )
     flower_info = response.text.strip()
     return {"flower_info": flower_info}
-
-
 @app.post("/identify-type")
 async def identify_flower_type(file: UploadFile = File(...)):
     image_bytes = await file.read()
@@ -111,17 +106,6 @@ async def identify_flower_type(file: UploadFile = File(...)):
     )
 
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=[
-            types.Part.from_bytes(
-                data=image_bytes,
-                mime_type=file.content_type or "image/jpeg"
-            ),
-            type_prompt
-        ]
-    )
-    flower_info = response.text.strip()
-    return {"flower_info": flower_info}
         model='gemini-2.5-flash',
         contents=[
             types.Part.from_bytes(
