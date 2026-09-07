@@ -100,9 +100,9 @@ async def identify_flower_type(file: UploadFile = File(...)):
     image_bytes = await file.read()
     
     type_prompt = (
-        "Analyze the photo and identify the flower species or common flower name only.\n"
-        "Do not give care instructions, diagnosis, or additional commentary.\n"
-        "Respond in plain text only with the flower type/name."
+        "Analyze the photo and identify the flower species.\n"
+        "Give some care instructions, diagnosis, or additional commentary.\n"
+        "Respond in text with the flower type/name and little details or fun fact."
     )
 
     response = client.models.generate_content(
