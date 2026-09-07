@@ -82,9 +82,18 @@
                             
                             <div class="flex gap-2 pt-1">
                                 <select id="searchMonth" class="bg-stone-50 border border-stone-200 text-xs rounded-lg p-1.5 focus:outline-none focus:border-emerald-500">
-                                    <option value="June">June</option>
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March">March</option>
                                     <option value="April">April</option>
                                     <option value="May">May</option>
+                                    <option value="June">June</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September">September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
                                 </select>
                                 <input type="number" id="searchDay" min="1" max="31" value="7" class="w-14 bg-stone-50 border border-stone-200 text-xs rounded-lg p-1.5 text-center focus:outline-none focus:border-emerald-500">
                                 <button onclick="checkBirthFlower()" class="bg-stone-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-stone-800 transition">Find</button>
@@ -107,6 +116,168 @@
             </div>
 
             <div class="border-t border-stone-200 pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-stone-400">Diagnosis History Log</h2>
+                    <button onclick="clearHistory()" id="clearHistoryBtn" class="text-[11px] text-red-600 hover:underline hidden">Clear All Logs</button>
+                </div>
+                <div id="historyLogContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <p id="noHistoryText" class="text-stone-400 text-xs italic">No diagnostic history found. Scan a plant inside the Clinic to start logs.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="scanner-view" class="hidden max-w-xl w-full mx-auto space-y-6 animate-fadeIn py-4">
+            <button onclick="switchTab('home')" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 transition">
+                ← Back to Dashboard
+            </button>
+
+            <div class="text-center space-y-1">
+                <h1 id="scannerHeading" class="text-3xl font-black text-stone-900 tracking-tight">Plant Recovery Clinic</h1>
+                <p id="scannerDescription" class="text-stone-600 text-xs">Examine spots, stems, or leaves to generate a plain-text healing routine.</p>
+                <div class="flex justify-center gap-2">
+                    <button id="recoverModeBtn" onclick="setScanMode('recover')" class="px-4 py-2 rounded-full bg-emerald-700 text-white text-[11px] font-semibold transition hover:bg-emerald-800">Recovery</button>
+                    <button id="identifyModeBtn" onclick="setScanMode('identify')" class="px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200">Flower Scanner</button>
+                    <button id="nearestModeBtn" onclick="setScanMode('nearest')" class="px-4 py-2 rounded-full bg-stone-100 text-stone-800 text-[11px] font-semibold transition hover:bg-stone-200">Garden Finder</button>
+                </div>
+                <div class="mx-auto max-w-xl rounded-2xl bg-emerald-50 border border-emerald-100 p-4 text-left text-[11px] text-emerald-900">
+                    Tip: Take a new photo of the plant each day to track recovery progress and update the treatment plan.
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-md p-6 border border-stone-200 relative">
+                <div class="relative border-2 border-dashed border-teal-300 hover:border-teal-500 rounded-2xl p-8 text-center transition-all bg-teal-50/20 cursor-pointer group">
+                    <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImage(event)">
+                    
+                    <div id="uploadPrompt" class="space-y-2 pointer-events-none">
+                        <div class="text-4xl group-hover:scale-110 transition-transform duration-200">🌱</div>
+                        <p class="text-stone-800 font-bold text-sm">Snap or Upload Plant Condition</p>
+                    </div>
+                    
+                    <img id="imagePreview" class="hidden max-h-60 mx-auto rounded-xl shadow-md object-cover border-2 border-white" />
+                </div>
+
+                <button onclick="startScan()" id="scanBtn" class="mt-5 w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                    <span>Analyze & Prescribe</span>
+                </button>
+            </div>
+
+            <div id="resultContainer" class="hidden bg-white rounded-3xl shadow-md p-6 border-t-4 border-emerald-600 space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-stone-100">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-lg">📋</span>
+                        <h2 class="font-bold text-stone-900">Botanical Treatment Protocol</h2>
+                    </div>
+                    <button onclick="copyToClipboard()" class="text-xs bg-stone-100 hover:bg-stone-200 px-2.5 py-1 rounded-lg text-stone-600 transition font-medium">📋 Copy Report</button>
+                </div>
+                <div id="resultText" class="text-stone-700 leading-relaxed text-sm whitespace-pre-line"></div>
+            </div>
+        </div>
+
+        <div id="fun-view" class="hidden max-w-4xl w-full mx-auto space-y-6 animate-fadeIn py-4">
+            <button onclick="switchTab('home')" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 transition">
+                ← Back to Dashboard
+            </button>
+
+            <div class="text-center space-y-2">
+                <h1 class="text-3xl font-black text-stone-900 tracking-tight">Fun</h1>
+                <p class="text-stone-600 text-xs">Choose a flower palette and enjoy today’s flower quote.</p>
+                <p id="themeIndicator" class="text-stone-500 text-xs">Selected: Default</p>
+                <div class="mt-3 rounded-3xl bg-white/90 border border-stone-200 p-5 text-left shadow-sm">
+                    <div class="text-[10px] font-bold uppercase tracking-wide text-stone-500 mb-2">Daily Flower Quotes.</div>
+                    <p class="text-stone-800 text-sm">"Roses are red, violets are blue, Bluetooth is searching, and I found you."</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onclick="setFlowerTheme('rose')" class="theme-button bg-rose-50 border border-rose-100 text-rose-700 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌹</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Rose</h3>
+                            <p class="text-stone-500 text-xs">Soft pink glow for a romantic mood.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('sunflower')" class="theme-button bg-yellow-50 border border-yellow-100 text-yellow-800 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌻</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Sunflower</h3>
+                            <p class="text-stone-500 text-xs">Bright and warm yellow tones.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('lavender')" class="theme-button bg-violet-50 border border-violet-100 text-violet-700 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">💜</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Lavender</h3>
+                            <p class="text-stone-500 text-xs">Calming purple and soft pastels.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('orchid')" class="theme-button bg-fuchsia-50 border border-fuchsia-100 text-fuchsia-700 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">💐</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Orchid</h3>
+                            <p class="text-stone-500 text-xs">Elegant mauve and cream palette.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('daisy')" class="theme-button bg-lime-50 border border-lime-100 text-lime-800 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌼</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Daisy</h3>
+                            <p class="text-stone-500 text-xs">Fresh light yellow with bright green accents.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('tulip')" class="theme-button bg-orange-50 border border-orange-100 text-orange-800 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌷</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Tulip</h3>
+                            <p class="text-stone-500 text-xs">Warm coral and sunset shades.</p>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="setFlowerTheme('jasmine')" class="theme-button bg-amber-50 border border-amber-100 text-amber-800 rounded-3xl p-5 text-left shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🌼</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900">Jasmine</h3>
+                            <p class="text-stone-500 text-xs">Soft cream and gold tones for peace.</p>
+                        </div>
+                    </div>
+                </button>
+            </div>
+
+            <div class="mt-6 flex justify-center">
+                <button onclick="restoreOriginalTheme()" class="bg-stone-700 hover:bg-stone-800 text-white font-bold py-3 px-6 rounded-xl transition-all transform active:scale-95 flex items-center gap-2">
+                    <span>🔄</span> Restore to Original Colors
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const BIRTHDAY_FLOWERS = {
+            "January": {
+                "1": "The Snowdrop", "2": "The Wild Violet", "3": "The Iris", "4": "The Yellow Hyacinth",
+                "5": "The Cyclamen", "6": "The Carnation", "7": "The White Camellia", "8": "The Purple Violet",
+                "9": "The Laurel", "10": "The Box Tree", "11": "The Moss", "12": "The Calla Lily",
+                "13": "The Yellow Rose", "14": "The White Pink", "15": "The Ivy", "16": "The Red Camellia",
+                "17": "The Star of Bethlehem", "18": "The Primrose", "19": "The Golden Rod", "20": "The Dahlia",
+                "21": "The Anemone", "22": "The Speedwell", "23": "The Snowdrop (Double)", "24": "The St. John's Wort",
+                "25": "The Winter Cherry", "26": "The Mistletoe", "27": "The Lobelia", "28": "The Red Pink",
+                "29": "The Moss Rose", "30": "The Primrose (Evening)", "31": "The Christmas Rose"
+            },
+            "February": {
+                "1": "The Primrose", "2": "The Snowdrop", "3": "The Violet", "4": "The Polyanthus",
+               <div class="border-t border-stone-200 pt-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xs font-bold uppercase tracking-wider text-stone-400">Diagnosis History Log</h2>
                     <button onclick="clearHistory()" id="clearHistoryBtn" class="text-[11px] text-red-600 hover:underline hidden">Clear All Logs</button>
